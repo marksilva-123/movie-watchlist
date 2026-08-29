@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
+
 import MovieList from "./components/MovieList";
 import AddMovieForm from "./components/AddMovieForm";
 import FilterBar from "./components/FilterBar";
 import SummaryBar from "./components/SummaryBar";
 
+import { searchMovies, toWatchlistMovie } from "./api/tmdb";
+import SearchBar from "./components/SearchBar";
+import SearchResults from "./components/SearchResults";
 
 const initialMovies = [
   {
@@ -38,6 +42,12 @@ function App() {
     return localStorage.getItem("filter") || "all";
   });
 
+  // NEW: TMDB search state
+  const [results, setResults] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   // Task 1: Save movies to localStorage
   useEffect(() => {
     localStorage.setItem("movies", JSON.stringify(movies));
@@ -53,10 +63,56 @@ function App() {
     localStorage.setItem("filter", filter);
   }, [filter]);
 
-  // Add movie
+  // NEW: Fetch TMDB search results
+  useEffect(() => {
+    if (!searchTerm) return;
+
+    let isCancelled = false;
+
+    const fetchResults = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const movies = await searchMovies(searchTerm);
+
+        if (!isCancelled) {
+          setResults(movies);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          setError("Failed to fetch movies. Try again.");
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchResults();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [searchTerm]);
+
+  // Add movie manually
   const handleAddMovie = (newMovie) => {
     setMovies([...movies, newMovie]);
   };
+
+  // NEW: Add movie from TMDB search
+  const handleAddFromSearch = (tmdbMovie) => {
+    // Avoid adding duplicates
+    if (movies.some((m) => m.id === tmdbMovie.id)) return;
+
+    const watchlistMovie = toWatchlistMovie(tmdbMovie);
+
+    setMovies([...movies, watchlistMovie]);
+  };
+
+  
 
   // Toggle watched
   const handleToggleWatched = (id) => {
@@ -92,6 +148,17 @@ function App() {
     <div className="app-container">
       <h1>Movie Watchlist</h1>
 
+      {/* NEW: TMDB Search */}
+      <SearchBar onSearch={setSearchTerm} />
+
+      <SearchResults
+        results={results}
+        onAdd={handleAddFromSearch}
+        isLoading={isLoading}
+        error={error}
+      />
+
+      {/* Existing Lab 04 watchlist */}
       <SummaryBar movies={movies} />
 
       <button
