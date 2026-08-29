@@ -111,7 +111,6 @@ function App() {
 
     setMovies([...movies, watchlistMovie]);
   };
-
   
 
   // Toggle watched
@@ -145,43 +144,45 @@ function App() {
   });
 
   return (
-    <div className="app-container">
-      <h1>Movie Watchlist</h1>
+  <div className="app-container">
+    <h1>Movie Watchlist</h1>
 
-      {/* NEW: TMDB Search */}
-      <SearchBar onSearch={setSearchTerm} />
+    {/* TMDB Search */}
+    <SearchBar onSearch={setSearchTerm} />
 
-      <SearchResults
-        results={results}
-        onAdd={handleAddFromSearch}
-        isLoading={isLoading}
-        error={error}
-      />
+    <SearchResults
+      results={results}
+      onAdd={handleAddFromSearch}
+      isLoading={isLoading}
+      error={error}
+    />
 
-      {/* Existing Lab 04 watchlist */}
-      <SummaryBar movies={movies} />
+    <hr />
 
-      <button
-        className="btn btn-error btn-sm"
-        onClick={handleClearAll}
-      >
-        Clear All
-      </button>
+    {/* Existing Lab 04 watchlist */}
+    <SummaryBar movies={movies} />
 
-      <AddMovieForm onAddMovie={handleAddMovie} />
+    <button
+      className="btn btn-error btn-sm"
+      onClick={handleClearAll}
+    >
+      Clear All
+    </button>
 
-      <FilterBar
-        currentFilter={filter}
-        onChangeFilter={setFilter}
-      />
+    <AddMovieForm onAddMovie={handleAddMovie} />
 
-      <MovieList
-        movies={visibleMovies}
-        onToggleWatched={handleToggleWatched}
-        onDelete={handleDeleteMovie}
-      />
-    </div>
-  );
+    <FilterBar
+      currentFilter={filter}
+      onChangeFilter={setFilter}
+    />
+
+    <MovieList
+      movies={visibleMovies}
+      onToggleWatched={handleToggleWatched}
+      onDelete={handleDeleteMovie}
+    />
+  </div>
+);
 }
 
 export default App;
