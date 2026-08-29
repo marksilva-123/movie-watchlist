@@ -4,6 +4,7 @@ import AddMovieForm from "./components/AddMovieForm";
 import FilterBar from "./components/FilterBar";
 import SummaryBar from "./components/SummaryBar";
 
+
 const initialMovies = [
   {
     id: 1,
